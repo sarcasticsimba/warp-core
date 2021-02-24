@@ -390,6 +390,19 @@ trait CoreQueries extends AbstractQueries {
   }
 
 
+
+
+
+
+
+
+
+
+  def updateTestExecutionTagQuery[T: TestExecutionTagRowLike](row: T): DBIO[TestExecutionTagRowWrapper] = {
+    // TODO this error; just filtering shows a `No implicits found for parameter wt` error
+    TestExecutionTag.filter(_.idTestExecution === row.idTestExecution)
+  }
+
   /**
    * Creates a [[DBIO]] for inserting or updating `row` into [[TestExecutionTag]] and returning an [[Option]] with
    * the result
@@ -397,11 +410,23 @@ trait CoreQueries extends AbstractQueries {
    * @param row to be inserted
    * @return a [[DBIO]] (not yet executed) for inserting or updating `row` into [[TestExecutionTag]]
    */
+    /*
   override def insertOrUpdateTestExecutionTagQuery[T: TestExecutionTagRowLikeType](row: T): DBIO[Option[TestExecutionTagRowWrapper]] = {
     TestExecutionTag returning TestExecutionTag.map(_.idTestExecutionTag) into (
       (row, id) => row.copy(idTestExecutionTag = id)
     ) insertOrUpdate(row)
   }
+    */
+
+
+
+
+
+
+
+
+
+
 
   /**
    * Creates a [[DBIO]] for inserting or updating `row` into [[TestExecutionMetaTag]] and returning an [[Int]] with the
