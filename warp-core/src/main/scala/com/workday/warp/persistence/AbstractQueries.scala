@@ -260,8 +260,11 @@ trait AbstractQueries {
    * @param row row to be inserted.
    * @return a [[DBIO]] (not yet executed) for inserting or updating `row` into [[TestExecutionTagRowLike]].
    */
-  def insertOrUpdateTestExecutionTagQuery[T: TestExecutionTagRowLikeType](row: T): DBIO[Option[TestExecutionTagRowLike]]
+//  def insertOrUpdateTestExecutionTagQuery[T: TestExecutionTagRowLikeType](row: T): DBIO[Option[TestExecutionTagRowLike]]
 
+
+  // TODO
+  def updateTestExecutionTagValueQuery[T: TestExecutionTagRowLikeType](row: T): DBIO[TestExecutionTagRowLike]
 
   /**
    * Creates a [[DBIO]] for inserting or updating `row` into [[TestExecutionMetaTag]] and returning an [[Int]] with the

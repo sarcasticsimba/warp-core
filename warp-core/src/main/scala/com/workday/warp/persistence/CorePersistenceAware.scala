@@ -223,13 +223,13 @@ trait CorePersistenceAware extends PersistenceAware {
       val nameRow: TagNameRowLike = this.findOrCreateTagName(name, isUserGenerated = isUserGenerated)
 
       val dbAction: DBIO[TestExecutionTagRow] = for {
-        tags: Option[(String, String)] <- this.testExecutionTagsQuery(idTestExecution, nameRow.idTagName)
+        tags: Option[TestExecutionTagRowWrapper] <- this.testExecutionTagsRowQuery(idTestExecution, nameRow.idTagName)
         action <- tags match {
           case None =>
             this.writeTestExecutionTagQuery(TestExecutionTagRow(Tables.nullId, idTestExecution, nameRow.idTagName, value))
 
-          case Some(_) =>
-            this.updateTestExecutionTagQuery(TestExecutionTagRow(Tables.nullId, idTestExecution, nameRow.idTagName, value))
+          case Some(existingTag: TestExecutionTagRowWrapper) =>
+            this.updateTestExecutionTagValueQuery(existingTag.copy(value = value))
         }
       } yield action
 

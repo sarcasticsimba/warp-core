@@ -57,6 +57,9 @@ class DefaultMeasurementCollectionControllerSpec extends WarpJUnitSpec with Core
   def testRecordTags(info: TestInfo): Unit = {
     val newTags: List[Tag] = List(
       // insert two execution metatags for an execution outer tag
+      ExecutionTag("key", "val"),
+      ExecutionTag("key", "different val")
+      /*
       ExecutionTag("key1", "val1", List(
         ExecutionMetaTag("metaKey11", "metaVal11"),
         ExecutionMetaTag("metaKey12", "metaVal12"),
@@ -80,6 +83,10 @@ class DefaultMeasurementCollectionControllerSpec extends WarpJUnitSpec with Core
 
       // Not ignoring duplicate execution and definition tags
       ExecutionTag("key3", "val3"),
+
+      // Intentionally updating key3's value
+      ExecutionTag("key3", "different value"),
+
       // These meta tags should successfully insert despite the duplicate tag value on the test definition
       ExecutionTag("key3", "val31", List(
         ExecutionMetaTag("metaKey31", "metaVal31"),
@@ -87,6 +94,7 @@ class DefaultMeasurementCollectionControllerSpec extends WarpJUnitSpec with Core
       )),
       DefinitionTag("key2", "val2"),
       DefinitionTag("key2", "val21")
+      */
     )
 
     val controller: DefaultMeasurementCollectionController = new DefaultMeasurementCollectionController(info, tags = newTags)

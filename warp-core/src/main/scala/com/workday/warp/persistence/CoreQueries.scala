@@ -398,25 +398,20 @@ trait CoreQueries extends AbstractQueries {
 
 
 
-  def updateTestExecutionTagQuery[T: TestExecutionTagRowLike](row: T): DBIO[TestExecutionTagRowWrapper] = {
-    // TODO this error; just filtering shows a `No implicits found for parameter wt` error
-    TestExecutionTag.filter(_.idTestExecution === row.idTestExecution)
-  }
+  override def updateTestExecutionTagValueQuery[T: TestExecutionTagRowLikeType](row: T): DBIO[TestExecutionTagRowWrapper] = {
+    def byId = TestExecutionTag.filter(_.idTestExecutionTag === row.idTestExecutionTag)
+    val update: DBIO[Int] = byId.map(_.value).update(row.value)
 
-  /**
-   * Creates a [[DBIO]] for inserting or updating `row` into [[TestExecutionTag]] and returning an [[Option]] with
-   * the result
-   *
-   * @param row to be inserted
-   * @return a [[DBIO]] (not yet executed) for inserting or updating `row` into [[TestExecutionTag]]
-   */
-    /*
-  override def insertOrUpdateTestExecutionTagQuery[T: TestExecutionTagRowLikeType](row: T): DBIO[Option[TestExecutionTagRowWrapper]] = {
-    TestExecutionTag returning TestExecutionTag.map(_.idTestExecutionTag) into (
-      (row, id) => row.copy(idTestExecutionTag = id)
-    ) insertOrUpdate(row)
+    // TODO consider head vs headoption here
+    val find: DBIO[TestExecutionTagRow] = byId.result.head
+
+    for {
+      numRowsUpdated: Int <- update
+      a = println(numRowsUpdated)
+      // TODO consider matching on numRowsUpdated to determine next step
+      tag: TestExecutionTagRow <- find
+    } yield tag
   }
-    */
 
 
 
