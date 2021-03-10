@@ -57,9 +57,6 @@ class DefaultMeasurementCollectionControllerSpec extends WarpJUnitSpec with Core
   def testRecordTags(info: TestInfo): Unit = {
     val newTags: List[Tag] = List(
       // insert two execution metatags for an execution outer tag
-      ExecutionTag("key", "val"),
-      ExecutionTag("key", "different val")
-      /*
       ExecutionTag("key1", "val1", List(
         ExecutionMetaTag("metaKey11", "metaVal11"),
         ExecutionMetaTag("metaKey12", "metaVal12"),
@@ -94,7 +91,6 @@ class DefaultMeasurementCollectionControllerSpec extends WarpJUnitSpec with Core
       )),
       DefinitionTag("key2", "val2"),
       DefinitionTag("key2", "val21")
-      */
     )
 
     val controller: DefaultMeasurementCollectionController = new DefaultMeasurementCollectionController(info, tags = newTags)

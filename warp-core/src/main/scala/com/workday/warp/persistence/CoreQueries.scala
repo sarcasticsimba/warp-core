@@ -3,6 +3,7 @@ package com.workday.warp.persistence
 import java.sql.Timestamp
 import java.time.LocalDate
 
+import org.pmw.tinylog.Logger
 import com.workday.warp.persistence.Tables._
 import com.workday.warp.persistence.Tables.profile.api._
 import com.workday.warp.persistence.TablesLike._
@@ -401,15 +402,15 @@ trait CoreQueries extends AbstractQueries {
   override def updateTestExecutionTagValueQuery[T: TestExecutionTagRowLikeType](row: T): DBIO[TestExecutionTagRowWrapper] = {
     def byId = TestExecutionTag.filter(_.idTestExecutionTag === row.idTestExecutionTag)
     val update: DBIO[Int] = byId.map(_.value).update(row.value)
-
-    // TODO consider head vs headoption here
-    val find: DBIO[TestExecutionTagRow] = byId.result.head
+    val find: DBIO[TestExecutionTagRow] = byId.result.head // TODO consider head vs headoption here
 
     for {
-      numRowsUpdated: Int <- update
-      a = println(numRowsUpdated)
-      // TODO consider matching on numRowsUpdated to determine next step
-      tag: TestExecutionTagRow <- find
+      _ <- {
+        val rowsAffected: DBIO[Int] = update
+        Logger.info(s"Number of rows updated: $rowsAffected")
+        rowsAffected
+      }
+      tag: TestExecutionTagRow <- find // TODO consider matching on numRowsUpdated to determine next step
     } yield tag
   }
 
