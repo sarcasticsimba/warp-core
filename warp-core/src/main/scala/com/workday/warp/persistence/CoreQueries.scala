@@ -10,6 +10,8 @@ import com.workday.warp.persistence.TablesLike._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.workday.warp.persistence.IdentifierSyntax._
+import slick.dbio.Effect
+import slick.sql.SqlAction
 
 /**
   * Defines functions for creating read and write [[Query]]. These queries can be composed, converted to [[DBIOAction]],
@@ -285,6 +287,9 @@ trait CoreQueries extends AbstractQueries {
     } yield (name.name, tag.value)
   }
 
+  override def testDefinitionTagsRowQuery(idTestDefinition: Int, idTagName: Int): DBIO[Option[TestDefinitionTagRowWrapper]] = {
+    TestDefinitionTag.filter(row => row.idTestDefinition === idTestDefinition && row.idTagName === idTagName).result.headOption
+  }
 
   /**
     * Creates a [[Query]] for reading the tag with id `idTagName` set on the [[TestDefinitionRow]] with id `idTestDefinition`.
@@ -405,16 +410,24 @@ trait CoreQueries extends AbstractQueries {
     val find: DBIO[TestExecutionTagRow] = byId.result.head // TODO consider head vs headoption here
 
     for {
-      _ <- {
-        val rowsAffected: DBIO[Int] = update
-        Logger.info(s"Number of rows updated: $rowsAffected")
-        rowsAffected
-      }
+      rowsUpdated: Int <- update
+      _ = Logger.info(s"Number of rows affected: $rowsUpdated")
       tag: TestExecutionTagRow <- find // TODO consider matching on numRowsUpdated to determine next step
     } yield tag
   }
 
 
+  override def updateTestDefinitionTagValueQuery[T: TestDefinitionTagRowLikeType](row: T): DBIO[TestDefinitionTagRowWrapper] = {
+    def byId = TestDefinitionTag.filter(_.idTestDefinitionTag === row.idTestDefinitionTag)
+    val update: DBIO[Int] = byId.map(_.value).update(row.value)
+    val find: DBIO[TestDefinitionTagRow] = byId.result.head // TODO consider head vs headoption here
+
+    for {
+      rowsUpdated: Int <- update
+      _ = Logger.info(s"Number of rows affected: $rowsUpdated")
+      tag: TestDefinitionTagRow <- find // TODO consider matching on numRowsUpdated to determine next step
+    } yield tag
+  }
 
 
 

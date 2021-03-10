@@ -271,21 +271,26 @@ trait CorePersistenceAware extends PersistenceAware {
       * @param value value of the tag.
       * @return a [[TestDefinitionTagRowLike]] with the given parameters.
       */
+    @throws[scala.RuntimeException]
     @throws[WarpFieldPersistenceException]
     override def recordTestDefinitionTag(idTestDefinition: Int,
                                        name: String,
                                        value: String,
                                        isUserGenerated: Boolean = true): TestDefinitionTagRowLike = {
-        val nameRow: TagNameRowLike = this.findOrCreateTagName(name, isUserGenerated = isUserGenerated)
-        val tdTagRow: TestDefinitionTagRow = TestDefinitionTagRow(Tables.nullId, idTestDefinition, nameRow.idTagName, value)
-        val updatedRow = this.insertOrUpdateTestDefinitionTagQuery(tdTagRow)
+      val nameRow: TagNameRowLike = this.findOrCreateTagName(name, isUserGenerated = isUserGenerated)
 
-        val updateRowQuery: DBIO[TestDefinitionTagRowWrapper] = for {
-          row: Option[Tables.TestDefinitionTagRowWrapper] <- updatedRow
-          tag <- row.fold (ifEmpty = this.readTestDefinitionTagQuery(idTestDefinition, name).map(_.get)) (DBIO.successful)
-        } yield tag
+      val dbAction: DBIO[TestDefinitionTagRow] = for {
+        tags: Option[TestDefinitionTagRowWrapper] <- this.testDefinitionTagsRowQuery(idTestDefinition, nameRow.idTagName)
+        action <- tags match {
+          case None =>
+            this.writeTestDefinitionTagQuery(TestDefinitionTagRow(Tables.nullId, idTestDefinition, nameRow.idTagName, value))
 
-        this.runWithRetries(updateRowQuery)
+          case Some(existingTag: TestDefinitionTagRowWrapper) =>
+            this.updateTestDefinitionTagValueQuery(existingTag.copy(value = value))
+        }
+      } yield action
+
+        this.runWithRetries(dbAction)
     }
 
 

@@ -170,6 +170,9 @@ trait AbstractQueries {
   def testExecutionTagsQuery(idTestExecution: Int): Query[(Rep[String], Rep[String]), (String, String), Seq]
 
 
+  // TODO
+  def testDefinitionTagsRowQuery(idTestDefinition: Int, idTagName: Int): DBIO[Option[TestDefinitionTagRowLike]]
+
   /**
     * Creates a [[Query]] for reading the tag with id `idTagName` set on the [[TestDefinitionRowLike]] with id `idTestDefinition`.
     *
@@ -265,6 +268,7 @@ trait AbstractQueries {
 
   // TODO
   def updateTestExecutionTagValueQuery[T: TestExecutionTagRowLikeType](row: T): DBIO[TestExecutionTagRowLike]
+  def updateTestDefinitionTagValueQuery[T: TestDefinitionTagRowLikeType](row: T): DBIO[TestDefinitionTagRowLike]
 
   /**
    * Creates a [[DBIO]] for inserting or updating `row` into [[TestExecutionMetaTag]] and returning an [[Int]] with the
